@@ -2,6 +2,7 @@
 import os
 import argparse
 import datetime
+import six
 import torch
 import torchtext.data as data
 import torchtext.datasets as datasets
@@ -21,7 +22,7 @@ parser.add_argument('-save-interval', type=int, default=500, help='how many step
 parser.add_argument('-save-dir', type=str, default='snapshot', help='where to save the snapshot')
 parser.add_argument('-early-stop', type=int, default=1000, help='iteration numbers to stop without performance increasing')
 parser.add_argument('-save-best', type=bool, default=True, help='whether to save when get best performance')
-# data 
+# data
 parser.add_argument('-shuffle', action='store_true', default=False, help='shuffle the data every epoch')
 # model
 parser.add_argument('-dropout', type=float, default=0.5, help='the probability for dropout [default: 0.5]')
@@ -46,12 +47,12 @@ def sst(text_field, label_field,  **kargs):
     text_field.build_vocab(train_data, dev_data, test_data)
     label_field.build_vocab(train_data, dev_data, test_data)
     train_iter, dev_iter, test_iter = data.BucketIterator.splits(
-                                        (train_data, dev_data, test_data), 
-                                        batch_sizes=(args.batch_size, 
-                                                     len(dev_data), 
+                                        (train_data, dev_data, test_data),
+                                        batch_sizes=(args.batch_size,
+                                                     len(dev_data),
                                                      len(test_data)),
                                         **kargs)
-    return train_iter, dev_iter, test_iter 
+    return train_iter, dev_iter, test_iter
 
 
 # load MR dataset
@@ -60,7 +61,7 @@ def mr(text_field, label_field, **kargs):
     text_field.build_vocab(train_data, dev_data)
     label_field.build_vocab(train_data, dev_data)
     train_iter, dev_iter = data.Iterator.splits(
-                                (train_data, dev_data), 
+                                (train_data, dev_data),
                                 batch_sizes=(args.batch_size, len(dev_data)),
                                 **kargs)
     return train_iter, dev_iter
@@ -95,7 +96,7 @@ if args.snapshot is not None:
 if args.cuda:
     torch.cuda.set_device(args.device)
     cnn = cnn.cuda()
-        
+
 
 # train or predict
 if args.predict is not None:
@@ -103,7 +104,7 @@ if args.predict is not None:
     print('\n[Text]  {}\n[Label] {}\n'.format(args.predict, label))
 elif args.test:
     try:
-        train.eval(test_iter, cnn, args) 
+        train.eval(test_iter, cnn, args)
     except Exception as e:
         print("\nSorry. The test dataset doesn't  exist.\n")
 else:

@@ -3,6 +3,7 @@ import os
 import random
 import tarfile
 import urllib
+import codecs
 from torchtext import data
 
 
@@ -23,7 +24,7 @@ class TarDataset(data.Dataset):
             tpath = os.path.join(root, cls.filename)
             if not os.path.isfile(tpath):
                 print('downloading')
-                urllib.request.urlretrieve(cls.url, tpath)
+                urllib.urlretrieve(cls.url, tpath)
             with tarfile.open(tpath, 'r') as tfile:
                 print('extracting')
                 tfile.extractall(root)
@@ -77,10 +78,10 @@ class MR(TarDataset):
         if examples is None:
             path = self.dirname if path is None else path
             examples = []
-            with open(os.path.join(path, 'rt-polarity.neg'), errors='ignore') as f:
+            with codecs.open(os.path.join(path, 'rt-polarity.neg'), errors='ignore', encoding='utf-8') as f:
                 examples += [
                     data.Example.fromlist([line, 'negative'], fields) for line in f]
-            with open(os.path.join(path, 'rt-polarity.pos'), errors='ignore') as f:
+            with codecs.open(os.path.join(path, 'rt-polarity.pos'), errors='ignore', encoding='utf-8') as f:
                 examples += [
                     data.Example.fromlist([line, 'positive'], fields) for line in f]
         super(MR, self).__init__(examples, fields, **kwargs)
